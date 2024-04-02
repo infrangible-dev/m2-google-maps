@@ -1,0 +1,35 @@
+<?php
+
+declare(strict_types=1);
+
+use Magento\Framework\View\TemplateEngine\Php;
+use Infrangible\GoogleMaps\Block\Widget\GoogleMaps\Autocomplete;
+
+/**
+ * @author      Andreas Knollmann
+ * @copyright   2014-2024 Softwareentwicklung Andreas Knollmann
+ * @license     http://www.opensource.org/licenses/mit-license.php MIT
+ */
+
+/** @var Php $this */
+/** @var Autocomplete $block */
+?>
+
+<div class="google-maps-input">
+    <label for="<?php echo $block->getInputId(); ?>"><?php echo __('Location Search'); ?></label>
+    <input type="text" name="<?php echo $block->getInputId(); ?>" id="<?php echo $block->getInputId(); ?>" value="<?php echo $block->getInputValue(); ?>" class="google-maps-input-text">
+</div>
+
+<!--suppress JSUnresolvedVariable, JSUnresolvedFunction -->
+<script type="text/javascript">
+    document.addEventListener("google-maps-api", function() {
+        var input = document.getElementById('<?php echo $block->getInputId(); ?>');
+        new google.maps.places.Autocomplete(
+            input,
+            {
+                types: ['geocode'],
+                componentRestrictions: {<?php echo $block->getComponentRestrictions(); ?>}
+            }
+        );
+    });
+</script>

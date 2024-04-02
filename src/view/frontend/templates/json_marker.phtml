@@ -1,0 +1,108 @@
+<?php
+
+declare(strict_types=1);
+
+use Magento\Framework\View\TemplateEngine\Php;
+use Infrangible\GoogleMaps\Block\Widget\GoogleMaps\JsonMarker;
+
+/**
+ * @author      Andreas Knollmann
+ * @copyright   2014-2024 Softwareentwicklung Andreas Knollmann
+ * @license     http://www.opensource.org/licenses/mit-license.php MIT
+ */
+
+/** @var Php $this */
+/** @var JsonMarker $block */
+$styles = [];
+if ($block->getWidth()) {
+    $styles[] = sprintf('width: %spx;', $block->getWidth());
+}
+if ($block->getHeight()) {
+    $styles[] = sprintf('height: %spx;', $block->getHeight());
+}
+[$centerLatitude, $centerLongitude] = $block->getMapCenter();
+?>
+
+<div id="<?php echo $block->getMapId(); ?>" class="google-maps" <?php if ( ! empty($styles)): ?>style="<?php echo implode(' ', $styles); ?>"<?php endif; ?>></div>
+
+<!--suppress JSUnresolvedVariable, JSUnresolvedFunction -->
+<script type="text/javascript">
+    document.addEventListener("google-maps-api", function() {
+        var mapCenter = {lat: <?php echo $centerLatitude; ?>, lng: <?php echo $centerLongitude; ?>};
+
+        var mapConfig = {
+            center: mapCenter,
+            zoomControl: <?php echo $block->getZoomControl(); ?>,
+            mapTypeControl: <?php echo $block->getMapTypeControl(); ?>,
+            streetViewControl: <?php echo $block->getStreetViewControl(); ?>,
+            rotateControl: <?php echo $block->getRotateControl(); ?>,
+            scaleControl: <?php echo $block->getScaleControl(); ?>,
+            fullscreenControl: <?php echo $block->getFullscreenControl(); ?>
+        };
+
+        <?php if ($block->getZoom()): ?>
+            mapConfig.zoom = <?php echo $block->getZoom(); ?>;
+        <?php endif; ?>
+
+        mapConfig.styles = [{
+            featureType: "administrative",
+            stylers: [{visibility: "<?php echo $block->getAdministrativeStyle(); ?>"}]
+        }, {
+            featureType: "landscape",
+            stylers: [{visibility: "<?php echo $block->getLandscapeStyle(); ?>"}]
+        }, {
+            featureType: "poi",
+            stylers: [{visibility: "<?php echo $block->getPOIStyle(); ?>"}]
+        }, {
+            featureType: "road",
+            stylers: [{visibility: "<?php echo $block->getRoadStyle(); ?>"}]
+        }, {
+            featureType: "transit",
+            stylers: [{visibility: "<?php echo $block->getTransitStyle(); ?>"}]
+        }, {
+            featureType: "water",
+            stylers: [{visibility: "<?php echo $block->getWaterStyle(); ?>"}]
+        }];
+
+        var map = new google.maps.Map(document.getElementById('<?php echo $block->getMapId(); ?>'), mapConfig);
+
+        var locations = JSON.parse('<?php echo $block->getMarkerJson(); ?>');
+
+        var i, location, markerConfig, title, marker, infoWindowContent, infoWindow;
+
+        for (i = 0; i < locations.length; i++) {
+            location = locations[i];
+
+            markerConfig = {
+                position: new google.maps.LatLng(location.lat, location.lng),
+                map
+            };
+
+            title = location.title;
+
+            if (title) {
+                markerConfig.title = title;
+            }
+
+            marker = new google.maps.Marker(markerConfig);
+
+            infoWindowContent = location.info_window;
+
+            if (infoWindowContent) {
+                infoWindow = new google.maps.InfoWindow({
+                    content: infoWindowContent
+                });
+
+                marker.addListener("click", (function(infoWindow, marker) {
+                    return function() {
+                        infoWindow.open({
+                            anchor: marker,
+                            map,
+                            shouldFocus: false
+                        });
+                    }
+                })(infoWindow, marker));
+            }
+        }
+    });
+</script>
