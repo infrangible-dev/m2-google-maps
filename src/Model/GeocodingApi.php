@@ -102,7 +102,7 @@ class GeocodingApi
             }
         }
 
-        if (!$this->variables->isEmpty($components)) {
+        if (!$this->variables->isEmpty($language)) {
             $searchParameters['language'] = $language;
         }
 
