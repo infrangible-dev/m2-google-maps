@@ -24,5 +24,15 @@
                 <value id="infrangible_google_maps_ggpht_com" type="host">*.ggpht.com</value>
             </values>
         </policy>
+        <policy id="font-src">
+            <values>
+                <value id="infrangible_google_maps_fonts_gstatic_com" type="host">fonts.gstatic.com</value>
+            </values>
+        </policy>
+        <policy id="style-src">
+            <values>
+                <value id="infrangible_google_maps_fonts_googleapis_com" type="host">fonts.googleapis.com</value>
+            </values>
+        </policy>
     </policies>
 </csp_whitelist>

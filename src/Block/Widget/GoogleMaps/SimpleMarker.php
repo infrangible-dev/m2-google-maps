@@ -53,6 +53,6 @@ class SimpleMarker
     {
         $infoWindow = $this->getData('info_window');
 
-        return $infoWindow === null ? '' : htmlspecialchars_decode($infoWindow);
+        return $infoWindow === null ? '' : preg_replace("/[\r\n]/", '', htmlspecialchars_decode($infoWindow));
     }
 }
