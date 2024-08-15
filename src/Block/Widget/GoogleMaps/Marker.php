@@ -21,23 +21,23 @@ abstract class Marker
     }
 
     /**
-     * @return int|null
+     * @return string|null
      */
-    public function getWidth(): ?int
+    public function getWidth(): ?string
     {
         $value = $this->getData('width');
 
-        return $value === null ? null : intval($value);
+        return $value === null ? null : strval($value);
     }
 
     /**
-     * @return int|null
+     * @return string|null
      */
-    public function getHeight(): ?int
+    public function getHeight(): ?string
     {
         $value = $this->getData('height');
 
-        return $value === null ? null : intval($value);
+        return $value === null ? null : strval($value);
     }
 
     /**
