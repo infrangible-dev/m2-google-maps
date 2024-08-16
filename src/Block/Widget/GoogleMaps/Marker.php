@@ -145,4 +145,32 @@ abstract class Marker
     {
         return $this->getData('water') ? 'on' : 'off';
     }
+
+    /**
+     * @return string|null
+     */
+    public function getWidthStyle(): ?string
+    {
+        $width = $this->getWidth();
+        if ($width) {
+            return  is_numeric($width) 
+                ? sprintf('width: %spx;', $width) 
+                : sprintf('width: %s;', $width);
+        }
+        return null;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getHeightStyle(): ?string
+    {
+        $height = $this->getHeight();
+        if ($height) {
+            return  is_numeric($height) 
+                ? sprintf('height: %spx;', $height) 
+                : sprintf('height: %s;', $height);
+        }
+        return null;
+    }
 }

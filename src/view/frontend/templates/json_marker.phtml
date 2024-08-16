@@ -13,15 +13,10 @@ use Infrangible\GoogleMaps\Block\Widget\GoogleMaps\JsonMarker;
 
 /** @var Php $this */
 /** @var JsonMarker $block */
-$styles = [];
-$width = $block->getWidth();
-if ($width) {
-    $styles[] = is_numeric($width) ? sprintf('width: %spx;', $width) : $width;
-}
-$height = $block->getHeight();
-if ($height) {
-    $styles[] = is_numeric($height) ? sprintf('height: %spx;', $height) : $height;
-}
+$styles = array_filter([
+    $block->getWidthStyle(),
+    $block->getHeightStyle(),
+]);
 [$centerLatitude, $centerLongitude] = $block->getMapCenter();
 ?>
 
