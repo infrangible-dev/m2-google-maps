@@ -13,15 +13,10 @@ use Infrangible\GoogleMaps\Block\Widget\GoogleMaps\SimpleMarker;
 
 /** @var Php $this */
 /** @var SimpleMarker $block */
-$styles = [];
-$width = $block->getWidth();
-if ($width) {
-    $styles[] = is_numeric($width) ? sprintf('width: %spx;', $width) : $width;
-}
-$height = $block->getHeight();
-if ($height) {
-    $styles[] = is_numeric($height) ? sprintf('height: %spx;', $height) : $height;
-}
+$styles = array_filter([
+    $block->getWidthStyle(),
+    $block->getHeightStyle(),
+]);
 ?>
 
 <div id="<?php echo $block->getMapId(); ?>" class="google-maps" <?php if (! empty($styles)): ?>style="<?php echo implode(' ', $styles); ?>"<?php endif; ?>></div>
