@@ -2,25 +2,21 @@
 
 declare(strict_types=1);
 
-use Magento\Framework\View\TemplateEngine\Php;
-use Infrangible\GoogleMaps\Block\Widget\GoogleMaps\Api;
-
 /**
  * @author      Andreas Knollmann
- * @copyright   2014-2024 Softwareentwicklung Andreas Knollmann
+ * @copyright   Copyright (c) 2014-2026 Softwareentwicklung Andreas Knollmann
  * @license     http://www.opensource.org/licenses/mit-license.php MIT
  */
 
-/** @var Php $this */
+use Infrangible\GoogleMaps\Block\Widget\GoogleMaps\Api;
+use Magento\Framework\Escaper;
+
 /** @var Api $block */
+/** @var Escaper $escaper */
 ?>
-
-<script type="text/javascript">
+<script>
     function googleMapsApi() {
-        var event = new CustomEvent("google-maps-api", { "detail": "Example of an event" });
-
-        document.dispatchEvent(event);
+        document.dispatchEvent(new CustomEvent("google-maps-api"));
     }
 </script>
-
-<script src="https://maps.googleapis.com/maps/api/js?key=<?php echo $block->getApiKey(); ?>&language=<?php echo $block->getLanguage(); ?>&libraries=places&callback=googleMapsApi&v=weekly" async></script>
+<script src="<?= $escaper->escapeUrl($block->getScriptUrl()) ?>" async></script>

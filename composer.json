@@ -2,24 +2,33 @@
     "name": "infrangible/m2-google-maps",
     "description": "Infrangible Magento 2 Google Maps",
     "type": "magento2-module",
-    "version": "1.1.2",
+    "version": "2.0.0",
     "license": "MIT",
     "keywords": [
         "Magento"
     ],
-    "homepage": "https://github.com/infrangible-dev/m2-google-maps",
+    "homepage": "https://www.infrangible.dev/modules/google-maps",
     "authors": [
         {
             "name": "Andreas Knollmann",
-            "email": "a.knollmann@seak.dev",
-            "homepage": "https://www.seak.dev",
+            "email": "a.knollmann@infrangible.dev",
+            "homepage": "https://www.infrangible.dev",
             "role": "Developer"
         }
     ],
     "require": {
-        "php": ">=7.1",
-        "magento/framework": "~101.0.0|~102.0.0|~103.0.0",
-        "infrangible/m2-foundation": "~2.2.0"
+        "php": ">=8.2",
+        "fewedev/base": "~2.4.1",
+        "infrangible/m2-core": "~5.0.4",
+        "infrangible/m2-foundation": "~3.0.1",
+        "magento/framework": "~103.0.6",
+        "magento/module-backend": "~102.0.0",
+        "magento/module-cms": "~104.0.0",
+        "magento/module-config": "~101.2.0",
+        "magento/module-csp": "~100.4.0",
+        "magento/module-widget": "~101.2.0",
+        "psr/log": "~2.0.0||~3.0.0",
+        "symfony/console": "~5.4.0||~6.4.0||~7.4.0"
     },
     "autoload": {
         "files": [

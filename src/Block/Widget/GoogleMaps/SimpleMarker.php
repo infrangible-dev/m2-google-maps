@@ -2,20 +2,25 @@
 
 declare(strict_types=1);
 
+/**
+ * @author      Andreas Knollmann
+ * @copyright   Copyright (c) 2014-2026 Softwareentwicklung Andreas Knollmann
+ * @license     http://www.opensource.org/licenses/mit-license.php MIT
+ */
+
 namespace Infrangible\GoogleMaps\Block\Widget\GoogleMaps;
 
 /**
- * @author      Andreas Knollmann
- * @copyright   2014-2024 Softwareentwicklung Andreas Knollmann
- * @license     http://www.opensource.org/licenses/mit-license.php MIT
+ * Widget with a map and one marker, with a title and an info window.
  */
-class SimpleMarker
-    extends Marker
+class SimpleMarker extends Marker
 {
     /**
+     * Sets the template.
+     *
      * @return void
      */
-    protected function _construct()
+    protected function _construct(): void
     {
         $this->setTemplate('Infrangible_GoogleMaps::simple_marker.phtml');
 
@@ -23,36 +28,45 @@ class SimpleMarker
     }
 
     /**
-     * @return string
+     * Returns the latitude of the marker.
+     *
+     * @return float
      */
-    public function getLatitude(): string
+    public function getLatitude(): float
     {
-        return $this->getData('lat');
+        return (float)$this->getStringData('lat');
     }
 
     /**
-     * @return string
+     * Returns the longitude of the marker.
+     *
+     * @return float
      */
-    public function getLongitude(): string
+    public function getLongitude(): float
     {
-        return $this->getData('lng');
+        return (float)$this->getStringData('lng');
     }
 
     /**
-     * @return string
+     * Returns the title of the marker as plain text.
+     *
+     * @return string|null
      */
     public function getTitle(): ?string
     {
-        return $this->getData('title');
+        // the widget stores its parameters with HTML entities, the title is plain text
+        $title = htmlspecialchars_decode($this->getStringData('title'), ENT_QUOTES | ENT_HTML5);
+
+        return $title === '' ? null : $title;
     }
 
     /**
+     * Returns the HTML of the info window, without line breaks.
+     *
      * @return string
      */
     public function getInfoWindow(): string
     {
-        $infoWindow = $this->getData('info_window');
-
-        return $infoWindow === null ? '' : preg_replace("/[\r\n]/", '', htmlspecialchars_decode($infoWindow));
+        return (string)preg_replace("/[\r\n]/", '', htmlspecialchars_decode($this->getStringData('info_window')));
     }
 }

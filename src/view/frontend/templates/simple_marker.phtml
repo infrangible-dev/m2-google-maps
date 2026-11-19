@@ -2,89 +2,67 @@
 
 declare(strict_types=1);
 
-use Magento\Framework\View\TemplateEngine\Php;
-use Infrangible\GoogleMaps\Block\Widget\GoogleMaps\SimpleMarker;
-
 /**
  * @author      Andreas Knollmann
- * @copyright   2014-2024 Softwareentwicklung Andreas Knollmann
+ * @copyright   Copyright (c) 2014-2026 Softwareentwicklung Andreas Knollmann
  * @license     http://www.opensource.org/licenses/mit-license.php MIT
  */
 
-/** @var Php $this */
+use Infrangible\GoogleMaps\Block\Widget\GoogleMaps\SimpleMarker;
+use Magento\Framework\Escaper;
+
 /** @var SimpleMarker $block */
-$styles = array_filter([
-    $block->getWidthStyle(),
-    $block->getHeightStyle(),
-]);
+/** @var Escaper $escaper */
 ?>
-
-<div id="<?php echo $block->getMapId(); ?>" class="google-maps" <?php if (! empty($styles)): ?>style="<?php echo implode(' ', $styles); ?>"<?php endif; ?>></div>
-
+<?php $styles = implode(' ', array_filter([$block->getWidthStyle(), $block->getHeightStyle()])); ?>
+<div id="<?= $escaper->escapeHtmlAttr($block->getMapId()) ?>" class="google-maps"
+    <?php if ($styles !== ''): ?>style="<?= $escaper->escapeHtmlAttr($styles) ?>"<?php endif; ?>></div>
 <!--suppress JSUnresolvedVariable, JSUnresolvedFunction -->
-<script type="text/javascript">
-    document.addEventListener("google-maps-api", function() {
-        var mapCenter = {lat: <?php echo $block->getLatitude(); ?>, lng: <?php echo $block->getLongitude(); ?>};
-
-        var mapConfig = {
+<script>
+    document.addEventListener("google-maps-api", function () {
+        const mapCenter = {
+            lat: <?= /* @noEscape */ $block->getLatitude() ?>,
+            lng: <?= /* @noEscape */ $block->getLongitude() ?>
+        };
+        const mapConfig = {
             center: mapCenter,
-            zoomControl: <?php echo $block->getZoomControl(); ?>,
-            mapTypeControl: <?php echo $block->getMapTypeControl(); ?>,
-            streetViewControl: <?php echo $block->getStreetViewControl(); ?>,
-            rotateControl: <?php echo $block->getRotateControl(); ?>,
-            scaleControl: <?php echo $block->getScaleControl(); ?>,
-            fullscreenControl: <?php echo $block->getFullscreenControl(); ?>
+            zoomControl: <?= /* @noEscape */ $block->getZoomControl() ?>,
+            mapTypeControl: <?= /* @noEscape */ $block->getMapTypeControl() ?>,
+            streetViewControl: <?= /* @noEscape */ $block->getStreetViewControl() ?>,
+            rotateControl: <?= /* @noEscape */ $block->getRotateControl() ?>,
+            scaleControl: <?= /* @noEscape */ $block->getScaleControl() ?>,
+            fullscreenControl: <?= /* @noEscape */ $block->getFullscreenControl() ?>
         };
-
-        <?php if ($block->getZoom()): ?>
-            mapConfig.zoom = <?php echo $block->getZoom(); ?>;
+        <?php if ($block->getZoom() !== null): ?>
+        mapConfig.zoom = <?= /* @noEscape */ $block->getZoom() ?>;
         <?php endif; ?>
 
-        mapConfig.styles = [{
-            featureType: "administrative",
-            stylers: [{ visibility: "<?php echo $block->getAdministrativeStyle(); ?>" }]
-        }, {
-            featureType: "landscape",
-            stylers: [{ visibility: "<?php echo $block->getLandscapeStyle(); ?>" }]
-        }, {
-            featureType: "poi",
-            stylers: [{ visibility: "<?php echo $block->getPOIStyle(); ?>" }]
-        }, {
-            featureType: "road",
-            stylers: [{ visibility: "<?php echo $block->getRoadStyle(); ?>" }]
-        }, {
-            featureType: "transit",
-            stylers: [{ visibility: "<?php echo $block->getTransitStyle(); ?>" }]
-        }, {
-            featureType: "water",
-            stylers: [{ visibility: "<?php echo $block->getWaterStyle(); ?>" }]
-        }];
-
-        var map = new google.maps.Map(document.getElementById('<?php echo $block->getMapId(); ?>'), mapConfig);
-
-        var markerConfig = {
-            position: mapCenter,
-            map
+        const visibilities = {
+            administrative: "<?= $escaper->escapeJs($block->getAdministrativeStyle()) ?>",
+            landscape: "<?= $escaper->escapeJs($block->getLandscapeStyle()) ?>",
+            poi: "<?= $escaper->escapeJs($block->getPOIStyle()) ?>",
+            road: "<?= $escaper->escapeJs($block->getRoadStyle()) ?>",
+            transit: "<?= $escaper->escapeJs($block->getTransitStyle()) ?>",
+            water: "<?= $escaper->escapeJs($block->getWaterStyle()) ?>"
         };
-
-        <?php if ($block->getTitle()): ?>
-            markerConfig.title = "<?php echo $block->getTitle(); ?>";
+        mapConfig.styles = Object.keys(visibilities).map(function (featureType) {
+            return {featureType: featureType, stylers: [{visibility: visibilities[featureType]}]};
+        });
+        const map = new google.maps.Map(
+            document.getElementById("<?= $escaper->escapeJs($block->getMapId()) ?>"),
+            mapConfig
+        );
+        const markerConfig = {position: mapCenter, map};
+        <?php if ($block->getTitle() !== null): ?>
+        markerConfig.title = "<?= $escaper->escapeJs($block->getTitle()) ?>";
         <?php endif; ?>
-
-        var marker = new google.maps.Marker(markerConfig);
-
-        <?php if ($block->getInfoWindow()): ?>
-            var infoWindow = new google.maps.InfoWindow({
-                content: "<?php echo $block->getInfoWindow(); ?>"
-            });
-
-            marker.addListener("click", () => {
-                infoWindow.open({
-                    anchor: marker,
-                    map,
-                    shouldFocus: false,
-                });
-            });
+        const marker = new google.maps.Marker(markerConfig);
+        <?php /* the info window is HTML of the widget, entered in the admin */ ?>
+        <?php if ($block->getInfoWindow() !== ''): ?>
+        const infoWindow = new google.maps.InfoWindow({content: "<?= $escaper->escapeJs($block->getInfoWindow()) ?>"});
+        marker.addListener("click", function () {
+            infoWindow.open({anchor: marker, map, shouldFocus: false});
+        });
         <?php endif; ?>
     });
 </script>

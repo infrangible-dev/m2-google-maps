@@ -2,64 +2,88 @@
 
 declare(strict_types=1);
 
+/**
+ * @author      Andreas Knollmann
+ * @copyright   Copyright (c) 2014-2026 Softwareentwicklung Andreas Knollmann
+ * @license     http://www.opensource.org/licenses/mit-license.php MIT
+ */
+
 namespace Infrangible\GoogleMaps\Command\Script;
 
+use FeWeDev\Base\Json;
 use FeWeDev\Base\Variables;
 use Infrangible\Core\Console\Command\Script;
 use Infrangible\GoogleMaps\Model\GeocodingApiFactory;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * @author      Andreas Knollmann
- * @copyright   2014-2024 Softwareentwicklung Andreas Knollmann
- * @license     http://www.opensource.org/licenses/mit-license.php MIT
+ * Searches the location of the address of the option --address and prints the result as JSON.
  */
-class GeocodingApi
-    extends Script
+class GeocodingApi extends Script
 {
-    /** @var Variables */
-    protected $variables;
-
-    /** @var GeocodingApiFactory */
-    protected $geocodingApiFactory;
-
-    public function __construct(Variables $variables, GeocodingApiFactory $geocodingApiFactory)
-    {
-        $this->variables = $variables;
-        $this->geocodingApiFactory = $geocodingApiFactory;
+    /**
+     * @param Variables $variables
+     * @param Json $json
+     * @param GeocodingApiFactory $geocodingApiFactory
+     */
+    public function __construct(
+        protected Variables $variables,
+        protected Json $json,
+        protected GeocodingApiFactory $geocodingApiFactory
+    ) {
     }
 
+    /**
+     * Searches the location and prints it; fails if nothing was found.
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     *
+     * @return int
+     */
     public function execute(InputInterface $input, OutputInterface $output): int
     {
-        $addressInput = $input->getOption('address');
-        $componentsInput = $input->getOption('components');
-        $languageInput = $input->getOption('language');
+        $address = $this->variables->stringValueOrDefault($input->getOption('address'));
+        $language = strtolower(trim($this->variables->stringValueOrDefault($input->getOption('language'))));
 
-        if ($componentsInput === null || $this->variables->isEmpty($componentsInput)) {
-            $components = ['country' => 'DE'];
-        } else {
-            $components = [];
+        $searchResult = $this->geocodingApiFactory->create()->searchLocation(
+            $address,
+            $this->getComponents($this->variables->stringValueOrDefault($input->getOption('components'))),
+            $language === '' ? 'de' : $language
+        );
 
-            foreach (explode(',', $componentsInput) as $component) {
-                foreach (explode(':', $component) as $filter => $value) {
-                    $components[$filter] = $value;
-                }
+        if (count($searchResult) === 0) {
+            $output->writeln(sprintf('<error>No location found for address: %s</error>', $address));
+
+            return Command::FAILURE;
+        }
+
+        $output->writeln((string)$this->json->encode($searchResult, true, true));
+
+        return Command::SUCCESS;
+    }
+
+    /**
+     * Returns the filters of the option, for example country:DE,postal_code:07743; country:DE without option.
+     *
+     * @param string $componentsInput
+     *
+     * @return array<string, string>
+     */
+    public function getComponents(string $componentsInput): array
+    {
+        $components = [];
+
+        foreach (explode(',', $componentsInput) as $component) {
+            $parts = explode(':', $component, 2);
+
+            if (count($parts) === 2 && trim($parts[ 0 ]) !== '' && trim($parts[ 1 ]) !== '') {
+                $components[ trim($parts[ 0 ]) ] = trim($parts[ 1 ]);
             }
         }
 
-        if ($languageInput === null || $this->variables->isEmpty($languageInput)) {
-            $language = 'de';
-        } else {
-            $language = strtolower($languageInput);
-        }
-
-        $geocodingApi = $this->geocodingApiFactory->create();
-
-        $searchResult = $geocodingApi->searchLocation($addressInput, $components, $language);
-
-        print_r($searchResult);
-
-        return 0;
+        return count($components) === 0 ? ['country' => 'DE'] : $components;
     }
 }

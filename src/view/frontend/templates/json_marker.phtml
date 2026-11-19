@@ -2,104 +2,77 @@
 
 declare(strict_types=1);
 
-use Magento\Framework\View\TemplateEngine\Php;
-use Infrangible\GoogleMaps\Block\Widget\GoogleMaps\JsonMarker;
-
 /**
  * @author      Andreas Knollmann
- * @copyright   2014-2024 Softwareentwicklung Andreas Knollmann
+ * @copyright   Copyright (c) 2014-2026 Softwareentwicklung Andreas Knollmann
  * @license     http://www.opensource.org/licenses/mit-license.php MIT
  */
 
-/** @var Php $this */
+use Infrangible\GoogleMaps\Block\Widget\GoogleMaps\JsonMarker;
+use Magento\Framework\Escaper;
+
 /** @var JsonMarker $block */
-$styles = array_filter([
-    $block->getWidthStyle(),
-    $block->getHeightStyle(),
-]);
+/** @var Escaper $escaper */
+
 [$centerLatitude, $centerLongitude] = $block->getMapCenter();
 ?>
-
-<div id="<?php echo $block->getMapId(); ?>" class="google-maps" <?php if ( ! empty($styles)): ?>style="<?php echo implode(' ', $styles); ?>"<?php endif; ?>></div>
-
+<?php $styles = implode(' ', array_filter([$block->getWidthStyle(), $block->getHeightStyle()])); ?>
+<div id="<?= $escaper->escapeHtmlAttr($block->getMapId()) ?>" class="google-maps"
+    <?php if ($styles !== ''): ?>style="<?= $escaper->escapeHtmlAttr($styles) ?>"<?php endif; ?>></div>
 <!--suppress JSUnresolvedVariable, JSUnresolvedFunction -->
-<script type="text/javascript">
-    document.addEventListener("google-maps-api", function() {
-        var mapCenter = {lat: <?php echo $centerLatitude; ?>, lng: <?php echo $centerLongitude; ?>};
-
-        var mapConfig = {
-            center: mapCenter,
-            zoomControl: <?php echo $block->getZoomControl(); ?>,
-            mapTypeControl: <?php echo $block->getMapTypeControl(); ?>,
-            streetViewControl: <?php echo $block->getStreetViewControl(); ?>,
-            rotateControl: <?php echo $block->getRotateControl(); ?>,
-            scaleControl: <?php echo $block->getScaleControl(); ?>,
-            fullscreenControl: <?php echo $block->getFullscreenControl(); ?>
+<script>
+    document.addEventListener("google-maps-api", function () {
+        const mapCenter = {
+            lat: <?= /* @noEscape */ (float)$centerLatitude ?>,
+            lng: <?= /* @noEscape */ (float)$centerLongitude ?>
         };
-
-        <?php if ($block->getZoom()): ?>
-            mapConfig.zoom = <?php echo $block->getZoom(); ?>;
+        const mapConfig = {
+            center: mapCenter,
+            zoomControl: <?= /* @noEscape */ $block->getZoomControl() ?>,
+            mapTypeControl: <?= /* @noEscape */ $block->getMapTypeControl() ?>,
+            streetViewControl: <?= /* @noEscape */ $block->getStreetViewControl() ?>,
+            rotateControl: <?= /* @noEscape */ $block->getRotateControl() ?>,
+            scaleControl: <?= /* @noEscape */ $block->getScaleControl() ?>,
+            fullscreenControl: <?= /* @noEscape */ $block->getFullscreenControl() ?>
+        };
+        <?php if ($block->getZoom() !== null): ?>
+        mapConfig.zoom = <?= /* @noEscape */ $block->getZoom() ?>;
         <?php endif; ?>
 
-        mapConfig.styles = [{
-            featureType: "administrative",
-            stylers: [{visibility: "<?php echo $block->getAdministrativeStyle(); ?>"}]
-        }, {
-            featureType: "landscape",
-            stylers: [{visibility: "<?php echo $block->getLandscapeStyle(); ?>"}]
-        }, {
-            featureType: "poi",
-            stylers: [{visibility: "<?php echo $block->getPOIStyle(); ?>"}]
-        }, {
-            featureType: "road",
-            stylers: [{visibility: "<?php echo $block->getRoadStyle(); ?>"}]
-        }, {
-            featureType: "transit",
-            stylers: [{visibility: "<?php echo $block->getTransitStyle(); ?>"}]
-        }, {
-            featureType: "water",
-            stylers: [{visibility: "<?php echo $block->getWaterStyle(); ?>"}]
-        }];
+        const visibilities = {
+            administrative: "<?= $escaper->escapeJs($block->getAdministrativeStyle()) ?>",
+            landscape: "<?= $escaper->escapeJs($block->getLandscapeStyle()) ?>",
+            poi: "<?= $escaper->escapeJs($block->getPOIStyle()) ?>",
+            road: "<?= $escaper->escapeJs($block->getRoadStyle()) ?>",
+            transit: "<?= $escaper->escapeJs($block->getTransitStyle()) ?>",
+            water: "<?= $escaper->escapeJs($block->getWaterStyle()) ?>"
+        };
+        mapConfig.styles = Object.keys(visibilities).map(function (featureType) {
+            return {featureType: featureType, stylers: [{visibility: visibilities[featureType]}]};
+        });
+        const map = new google.maps.Map(
+            document.getElementById("<?= $escaper->escapeJs($block->getMapId()) ?>"),
+            mapConfig
+        );
+        <?php /* JSON with escaped tags and quotes, safe in a script element */ ?>
+        const locations = <?= /* @noEscape */ $block->getLocationsJson() ?>;
 
-        var map = new google.maps.Map(document.getElementById('<?php echo $block->getMapId(); ?>'), mapConfig);
+        locations.forEach(function (location) {
+            const markerConfig = {position: new google.maps.LatLng(location.lat, location.lng), map};
 
-        var locations = JSON.parse('<?php echo $block->getMarkerJson(); ?>');
-
-        var i, location, markerConfig, title, marker, infoWindowContent, infoWindow;
-
-        for (i = 0; i < locations.length; i++) {
-            location = locations[i];
-
-            markerConfig = {
-                position: new google.maps.LatLng(location.lat, location.lng),
-                map
-            };
-
-            title = location.title;
-
-            if (title) {
-                markerConfig.title = title;
+            if (location.title) {
+                markerConfig.title = location.title;
             }
 
-            marker = new google.maps.Marker(markerConfig);
+            const marker = new google.maps.Marker(markerConfig);
 
-            infoWindowContent = location.info_window;
+            if (location.info_window) {
+                const infoWindow = new google.maps.InfoWindow({content: location.info_window});
 
-            if (infoWindowContent) {
-                infoWindow = new google.maps.InfoWindow({
-                    content: infoWindowContent
+                marker.addListener("click", function () {
+                    infoWindow.open({anchor: marker, map, shouldFocus: false});
                 });
-
-                marker.addListener("click", (function(infoWindow, marker) {
-                    return function() {
-                        infoWindow.open({
-                            anchor: marker,
-                            map,
-                            shouldFocus: false
-                        });
-                    }
-                })(infoWindow, marker));
             }
-        }
+        });
     });
 </script>

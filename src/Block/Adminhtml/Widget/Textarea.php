@@ -2,6 +2,12 @@
 
 declare(strict_types=1);
 
+/**
+ * @author      Andreas Knollmann
+ * @copyright   Copyright (c) 2014-2026 Softwareentwicklung Andreas Knollmann
+ * @license     http://www.opensource.org/licenses/mit-license.php MIT
+ */
+
 namespace Infrangible\GoogleMaps\Block\Adminhtml\Widget;
 
 use Magento\Backend\Block\Template;
@@ -10,44 +16,33 @@ use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\Data\Form\Element\Factory;
 
 /**
- * @author      Andreas Knollmann
- * @copyright   2014-2024 Softwareentwicklung Andreas Knollmann
- * @license     http://www.opensource.org/licenses/mit-license.php MIT
+ * Text area of a widget parameter (the JSON of markers, the restrictions of the autocomplete).
  */
-class Textarea
-    extends Template
+class Textarea extends Template
 {
-    /** @var Factory */
-    protected $elementFactory;
-
     /**
      * @param Context $context
      * @param Factory $elementFactory
-     * @param array   $data
+     * @param array $data
+     * @phpstan-param array<string, mixed> $data
      */
-    public function __construct(
-        Context $context,
-        Factory $elementFactory,
-        array $data = [])
+    public function __construct(Context $context, protected Factory $elementFactory, array $data = [])
     {
         parent::__construct($context, $data);
-
-        $this->elementFactory = $elementFactory;
     }
 
     /**
+     * Replaces the field of the parameter with the text area.
+     *
      * @param AbstractElement $element
      *
      * @return AbstractElement
      */
     public function prepareElementHtml(AbstractElement $element): AbstractElement
     {
-        /** @var \Magento\Framework\Data\Form\Element\Textarea $input */
         $input = $this->elementFactory->create('textarea', ['data' => $element->getData()]);
-
         $input->setId($element->getId());
         $input->setForm($element->getForm());
-
         $input->addClass('widget-option');
         $input->addClass('input-textarea');
         $input->addClass('admin__control-text');

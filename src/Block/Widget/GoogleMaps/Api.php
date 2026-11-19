@@ -2,6 +2,12 @@
 
 declare(strict_types=1);
 
+/**
+ * @author      Andreas Knollmann
+ * @copyright   Copyright (c) 2014-2026 Softwareentwicklung Andreas Knollmann
+ * @license     http://www.opensource.org/licenses/mit-license.php MIT
+ */
+
 namespace Infrangible\GoogleMaps\Block\Widget\GoogleMaps;
 
 use FeWeDev\Base\Variables;
@@ -10,80 +16,95 @@ use Infrangible\Core\Helper\Stores;
 use Magento\Framework\View\Element\Template;
 
 /**
- * @author      Andreas Knollmann
- * @copyright   2014-2024 Softwareentwicklung Andreas Knollmann
- * @license     http://www.opensource.org/licenses/mit-license.php MIT
+ * Loads the Google Maps API at the end of pages with a widget of the module, if enabled and an API key is configured.
  */
-class Api
-    extends Template
+class Api extends Template
 {
-    /** @var Registry */
-    protected $registryHelper;
-
-    /** @var Stores */
-    protected $storeHelper;
-
-    /** @var Variables */
-    protected $variables;
+    /** URL of the script of the API. */
+    public const API_URL = 'https://maps.googleapis.com/maps/api/js';
 
     /**
      * @param Template\Context $context
-     * @param Registry         $registryHelper
-     * @param Stores           $storeHelper
-     * @param Variables        $variables
-     * @param array            $data
+     * @param Registry $registryHelper
+     * @param Stores $storeHelper
+     * @param Variables $variables
+     * @param array $data
+     * @phpstan-param array<string, mixed> $data
      */
     public function __construct(
         Template\Context $context,
-        Registry $registryHelper,
-        Stores $storeHelper,
-        Variables $variables,
+        protected Registry $registryHelper,
+        protected Stores $storeHelper,
+        protected Variables $variables,
         array $data = []
     ) {
         parent::__construct($context, $data);
-
-        $this->registryHelper = $registryHelper;
-        $this->storeHelper = $storeHelper;
-        $this->variables = $variables;
     }
 
     /**
+     * Tells whether Google Maps is enabled.
+     *
      * @return bool
      */
     public function isEnabled(): bool
     {
-        return $this->storeHelper->getStoreConfig('infrangible_googlemaps/settings/enabled', true, true);
+        return $this->storeHelper->getStoreConfigFlag('infrangible_googlemaps/settings/enabled', true);
     }
 
     /**
+     * Returns the API key, or null.
+     *
      * @return string|null
      */
     public function getApiKey(): ?string
     {
-        return $this->storeHelper->getStoreConfig('infrangible_googlemaps/settings/api_key');
+        $apiKey = trim(
+            $this->variables->stringValueOrDefault(
+                $this->storeHelper->getStoreConfig('infrangible_googlemaps/settings/api_key')
+            )
+        );
+
+        return $apiKey === '' ? null : $apiKey;
     }
 
     /**
+     * Returns the language of the store, for example de of de_DE.
+     *
      * @return string
      */
     public function getLanguage(): string
     {
-        $locale = $this->storeHelper->getStoreConfig('general/locale/code');
+        $locale = $this->variables->stringValueOrDefault($this->storeHelper->getStoreConfig('general/locale/code'));
 
-        $localeParts = explode('_', $locale);
-
-        return reset($localeParts);
+        return explode('_', $locale)[ 0 ];
     }
 
     /**
-     * Render block HTML
+     * Returns the URL of the script of the API with key, language and the library places.
+     *
+     * @return string
+     */
+    public function getScriptUrl(): string
+    {
+        return self::API_URL . '?' . http_build_query(
+            [
+                'key'       => $this->getApiKey(),
+                'language'  => $this->getLanguage(),
+                'libraries' => 'places',
+                'callback'  => 'googleMapsApi',
+                'v'         => 'weekly'
+            ]
+        );
+    }
+
+    /**
+     * Renders the script if a widget of the page needs it.
      *
      * @return string
      */
     protected function _toHtml(): string
     {
-        if ($this->isEnabled() && $this->registryHelper->registry('google_maps_api')
-            && !$this->variables->isEmpty($this->getApiKey())) {
+        if ($this->isEnabled() && $this->registryHelper->registry('google_maps_api') && $this->getApiKey() !== null) {
             return parent::_toHtml();
         }
 

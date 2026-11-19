@@ -2,151 +2,151 @@
 
 <!--
  * @author      Andreas Knollmann
- * @copyright   2014-2024 Softwareentwicklung Andreas Knollmann
+ * @copyright   Copyright (c) 2014-2026 Softwareentwicklung Andreas Knollmann
  * @license     http://www.opensource.org/licenses/mit-license.php MIT
 -->
 <widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Widget:etc/widget.xsd">
     <widget class="Infrangible\GoogleMaps\Block\Widget\GoogleMaps\SimpleMarker" id="google_maps_simple_marker">
-        <label>Google Maps Simple Marker</label>
-        <description>Adds a Google map with a marker.</description>
+        <label translate="true">Google Maps Simple Marker</label>
+        <description translate="true">Adds a Google map with a marker.</description>
         <parameters>
             <parameter name="map_id" sort_order="10" visible="true" required="true" xsi:type="text">
-                <label>Map Id</label>
+                <label translate="true">Map Id</label>
             </parameter>
             <parameter name="width" sort_order="100" visible="true" required="false" xsi:type="text">
-                <label>Width</label>
-                <description>The width of the map in pixels. If left empty no width will be set.</description>
+                <label translate="true">Width</label>
+                <description translate="true">Width of the map in pixels, or a CSS length such as 100% or 20rem. Empty: no width.</description>
             </parameter>
             <parameter name="height" sort_order="110" visible="true" required="false" xsi:type="text">
-                <label>Height</label>
-                <description>The height of the map in pixels. If left empty no height will be set.</description>
+                <label translate="true">Height</label>
+                <description translate="true">Height of the map in pixels, or a CSS length such as 50vh or 20rem. Empty: no height.</description>
             </parameter>
             <parameter name="zoom" sort_order="120" visible="true" required="false" xsi:type="text">
-                <label>Zoom</label>
+                <label translate="true">Zoom</label>
             </parameter>
             <parameter name="zoom_control" sort_order="200" visible="true" required="false" xsi:type="select" source_model="Magento\Config\Model\Config\Source\Yesno">
-                <label>Zoom Control</label>
+                <label translate="true">Zoom Control</label>
             </parameter>
             <parameter name="map_type_control" sort_order="210" visible="true" required="false" xsi:type="select" source_model="Magento\Config\Model\Config\Source\Yesno">
-                <label>Map Type Control</label>
+                <label translate="true">Map Type Control</label>
             </parameter>
             <parameter name="street_view_control" sort_order="220" visible="true" required="false" xsi:type="select" source_model="Magento\Config\Model\Config\Source\Yesno">
-                <label>Street View Control</label>
+                <label translate="true">Street View Control</label>
             </parameter>
             <parameter name="rotate_control" sort_order="230" visible="true" required="false" xsi:type="select" source_model="Magento\Config\Model\Config\Source\Yesno">
-                <label>Rotate Control</label>
+                <label translate="true">Rotate Control</label>
             </parameter>
             <parameter name="scale_control" sort_order="240" visible="true" required="false" xsi:type="select" source_model="Magento\Config\Model\Config\Source\Yesno">
-                <label>Scale Control</label>
+                <label translate="true">Scale Control</label>
             </parameter>
             <parameter name="fullscreen_control" sort_order="250" visible="true" required="false" xsi:type="select" source_model="Magento\Config\Model\Config\Source\Yesno">
-                <label>Fullscreen Control</label>
+                <label translate="true">Fullscreen Control</label>
             </parameter>
             <parameter name="administrative" sort_order="300" visible="true" required="false" xsi:type="select" source_model="Magento\Config\Model\Config\Source\Yesno">
-                <label>Styles: Administrative Areas</label>
+                <label translate="true">Styles: Administrative Areas</label>
             </parameter>
             <parameter name="landscape" sort_order="310" visible="true" required="false" xsi:type="select" source_model="Magento\Config\Model\Config\Source\Yesno">
-                <label>Styles: Landscapes</label>
+                <label translate="true">Styles: Landscapes</label>
             </parameter>
             <parameter name="poi" sort_order="320" visible="true" required="false" xsi:type="select" source_model="Magento\Config\Model\Config\Source\Yesno">
-                <label>Styles: Points of Interest</label>
+                <label translate="true">Styles: Points of Interest</label>
             </parameter>
             <parameter name="road" sort_order="330" visible="true" required="false" xsi:type="select" source_model="Magento\Config\Model\Config\Source\Yesno">
-                <label>Styles: Roads</label>
+                <label translate="true">Styles: Roads</label>
             </parameter>
             <parameter name="transit" sort_order="340" visible="true" required="false" xsi:type="select" source_model="Magento\Config\Model\Config\Source\Yesno">
-                <label>Styles: Transit Stations and Lines</label>
+                <label translate="true">Styles: Transit Stations and Lines</label>
             </parameter>
             <parameter name="water" sort_order="350" visible="true" required="false" xsi:type="select" source_model="Magento\Config\Model\Config\Source\Yesno">
-                <label>Styles: Bodies of Water</label>
+                <label translate="true">Styles: Bodies of Water</label>
             </parameter>
             <parameter name="lat" sort_order="400" visible="true" required="true" xsi:type="text">
-                <label>Latitude</label>
+                <label translate="true">Latitude</label>
             </parameter>
             <parameter name="lng" sort_order="410" visible="true" required="true" xsi:type="text">
-                <label>Longitude</label>
+                <label translate="true">Longitude</label>
             </parameter>
             <parameter name="title" sort_order="420" visible="true" required="false" xsi:type="text">
-                <label>Title</label>
+                <label translate="true">Title</label>
             </parameter>
             <parameter name="info_window" sort_order="430" visible="true" required="false" xsi:type="block">
-                <label>Info Window</label>
-                <description>Do not use double quotes!</description>
+                <label translate="true">Info Window</label>
+                <description translate="true">Do not use double quotes!</description>
                 <block class="Infrangible\GoogleMaps\Block\Adminhtml\Widget\Editor"/>
             </parameter>
         </parameters>
     </widget>
     <widget class="Infrangible\GoogleMaps\Block\Widget\GoogleMaps\JsonMarker" id="google_maps_json_marker">
-        <label>Google Maps Json Marker</label>
-        <description>Add a Google map with a list of markers defined as Json.</description>
+        <label translate="true">Google Maps Json Marker</label>
+        <description translate="true">Add a Google map with a list of markers defined as Json.</description>
         <parameters>
             <parameter name="map_id" sort_order="10" visible="true" required="true" xsi:type="text">
-                <label>Map Id</label>
+                <label translate="true">Map Id</label>
             </parameter>
             <parameter name="width" sort_order="100" visible="true" required="false" xsi:type="text">
-                <label>Width</label>
-                <description>The width of the map in pixels. If left empty no width will be set.</description>
+                <label translate="true">Width</label>
+                <description translate="true">Width of the map in pixels, or a CSS length such as 100% or 20rem. Empty: no width.</description>
             </parameter>
             <parameter name="height" sort_order="110" visible="true" required="false" xsi:type="text">
-                <label>Height</label>
-                <description>The height of the map in pixels. If left empty no height will be set.</description>
+                <label translate="true">Height</label>
+                <description translate="true">Height of the map in pixels, or a CSS length such as 50vh or 20rem. Empty: no height.</description>
             </parameter>
             <parameter name="zoom" sort_order="120" visible="true" required="false" xsi:type="text">
-                <label>Zoom</label>
+                <label translate="true">Zoom</label>
             </parameter>
             <parameter name="zoom_control" sort_order="200" visible="true" required="false" xsi:type="select" source_model="Magento\Config\Model\Config\Source\Yesno">
-                <label>Zoom Control</label>
+                <label translate="true">Zoom Control</label>
             </parameter>
             <parameter name="map_type_control" sort_order="210" visible="true" required="false" xsi:type="select" source_model="Magento\Config\Model\Config\Source\Yesno">
-                <label>Map Type Control</label>
+                <label translate="true">Map Type Control</label>
             </parameter>
             <parameter name="street_view_control" sort_order="220" visible="true" required="false" xsi:type="select" source_model="Magento\Config\Model\Config\Source\Yesno">
-                <label>Street View Control</label>
+                <label translate="true">Street View Control</label>
             </parameter>
             <parameter name="rotate_control" sort_order="230" visible="true" required="false" xsi:type="select" source_model="Magento\Config\Model\Config\Source\Yesno">
-                <label>Rotate Control</label>
+                <label translate="true">Rotate Control</label>
             </parameter>
             <parameter name="scale_control" sort_order="240" visible="true" required="false" xsi:type="select" source_model="Magento\Config\Model\Config\Source\Yesno">
-                <label>Scale Control</label>
+                <label translate="true">Scale Control</label>
             </parameter>
             <parameter name="fullscreen_control" sort_order="250" visible="true" required="false" xsi:type="select" source_model="Magento\Config\Model\Config\Source\Yesno">
-                <label>Fullscreen Control</label>
+                <label translate="true">Fullscreen Control</label>
             </parameter>
             <parameter name="administrative" sort_order="300" visible="true" required="false" xsi:type="select" source_model="Magento\Config\Model\Config\Source\Yesno">
-                <label>Styles: Administrative Areas</label>
+                <label translate="true">Styles: Administrative Areas</label>
             </parameter>
             <parameter name="landscape" sort_order="310" visible="true" required="false" xsi:type="select" source_model="Magento\Config\Model\Config\Source\Yesno">
-                <label>Styles: Landscapes</label>
+                <label translate="true">Styles: Landscapes</label>
             </parameter>
             <parameter name="poi" sort_order="320" visible="true" required="false" xsi:type="select" source_model="Magento\Config\Model\Config\Source\Yesno">
-                <label>Styles: Points of Interest</label>
+                <label translate="true">Styles: Points of Interest</label>
             </parameter>
             <parameter name="road" sort_order="330" visible="true" required="false" xsi:type="select" source_model="Magento\Config\Model\Config\Source\Yesno">
-                <label>Styles: Roads</label>
+                <label translate="true">Styles: Roads</label>
             </parameter>
             <parameter name="transit" sort_order="340" visible="true" required="false" xsi:type="select" source_model="Magento\Config\Model\Config\Source\Yesno">
-                <label>Styles: Transit Stations and Lines</label>
+                <label translate="true">Styles: Transit Stations and Lines</label>
             </parameter>
             <parameter name="water" sort_order="350" visible="true" required="false" xsi:type="select" source_model="Magento\Config\Model\Config\Source\Yesno">
-                <label>Styles: Bodies of Water</label>
+                <label translate="true">Styles: Bodies of Water</label>
             </parameter>
             <parameter name="marker_json" sort_order="400" visible="true" required="true" xsi:type="block">
-                <label>Marker Json</label>
-                <description><![CDATA[List of markers with coordinates, title and optional info window, e.g. [{"lat":50.9553,"lng":11.6224,"title":"Softwareentwicklung Andreas Knollmann","info_window":"&lt;h2&gt;Softwareentwicklung Andreas Knollmann&lt;/h2&gt;&lt;p&gt;Brückenstr. 16&lt;/p&gt;&lt;p&gt;07743 Jena&lt;/p&gt;"}].]]></description>
+                <label translate="true">Marker Json</label>
+                <description translate="true"><![CDATA[List of markers with coordinates, title and optional info window, e.g. [{"lat":50.9553,"lng":11.6224,"title":"Softwareentwicklung Andreas Knollmann","info_window":"&lt;h2&gt;Softwareentwicklung Andreas Knollmann&lt;/h2&gt;&lt;p&gt;Brückenstr. 16&lt;/p&gt;&lt;p&gt;07743 Jena&lt;/p&gt;"}].]]></description>
                 <block class="Infrangible\GoogleMaps\Block\Adminhtml\Widget\Textarea"/>
             </parameter>
         </parameters>
     </widget>
     <widget class="Infrangible\GoogleMaps\Block\Widget\GoogleMaps\Autocomplete" id="google_maps_autocomplete">
-        <label>Google Maps Autocomplete</label>
-        <description>Adds a Google map autocomplete input.</description>
+        <label translate="true">Google Maps Autocomplete</label>
+        <description translate="true">Adds a Google map autocomplete input.</description>
         <parameters>
             <parameter name="input_id" sort_order="10" visible="true" required="true" xsi:type="text">
-                <label>Input Id</label>
+                <label translate="true">Input Id</label>
             </parameter>
             <parameter name="component_restrictions" sort_order="20" visible="true" required="false" xsi:type="block">
-                <label>Component Restrictions</label>
-                <description><![CDATA[List of restrictions, separated by comma, e.g. country: ["de", "at"]']]></description>
+                <label translate="true">Component Restrictions</label>
+                <description translate="true"><![CDATA[List of restrictions, separated by comma, e.g. country: ["de", "at"]]]></description>
                 <block class="Infrangible\GoogleMaps\Block\Adminhtml\Widget\Textarea"/>
             </parameter>
         </parameters>

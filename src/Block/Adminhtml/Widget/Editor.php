@@ -2,6 +2,12 @@
 
 declare(strict_types=1);
 
+/**
+ * @author      Andreas Knollmann
+ * @copyright   Copyright (c) 2014-2026 Softwareentwicklung Andreas Knollmann
+ * @license     http://www.opensource.org/licenses/mit-license.php MIT
+ */
+
 namespace Infrangible\GoogleMaps\Block\Adminhtml\Widget;
 
 use Infrangible\Core\Helper\Registry;
@@ -12,45 +18,31 @@ use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\Data\Form\Element\Factory;
 
 /**
- * @author      Andreas Knollmann
- * @copyright   2014-2024 Softwareentwicklung Andreas Knollmann
- * @license     http://www.opensource.org/licenses/mit-license.php MIT
+ * WYSIWYG editor of a widget parameter (the info window of a marker), without images, variables and widgets.
  */
-class Editor
-    extends Template
+class Editor extends Template
 {
-    /** @var Registry */
-    protected $registryHelper;
-
-    /** @var Factory */
-    protected $elementFactory;
-
-    /** @var Config */
-    protected $wysiwygConfig;
-
     /**
      * @param Registry $registryHelper
-     * @param Context  $context
-     * @param Factory  $elementFactory
-     * @param Config   $wysiwygConfig
-     * @param array    $data
+     * @param Context $context
+     * @param Factory $elementFactory
+     * @param Config $wysiwygConfig
+     * @param array $data
+     * @phpstan-param array<string, mixed> $data
      */
     public function __construct(
-        Registry $registryHelper,
+        protected Registry $registryHelper,
         Context $context,
-        Factory $elementFactory,
-        Config $wysiwygConfig,
+        protected Factory $elementFactory,
+        protected Config $wysiwygConfig,
         array $data = []
     ) {
         parent::__construct($context, $data);
-
-        $this->registryHelper = $registryHelper;
-
-        $this->elementFactory = $elementFactory;
-        $this->wysiwygConfig = $wysiwygConfig;
     }
 
     /**
+     * Replaces the field of the parameter with the editor.
+     *
      * @param AbstractElement $element
      *
      * @return AbstractElement
@@ -59,21 +51,16 @@ class Editor
     {
         $this->registryHelper->register('wysiwyg_config_add_images', false, true);
 
-        /** @var \Magento\Framework\Data\Form\Element\Editor $input */
         $input = $this->elementFactory->create('editor', ['data' => $element->getData()]);
-
         $input->setId($element->getId());
         $input->setForm($element->getForm());
         $input->setDataUsingMethod('wysiwyg', true);
         $input->setDataUsingMethod(
             'config',
-            $this->wysiwygConfig->getConfig([
-                                                'add_variables'  => false,
-                                                'add_widgets'    => false,
-                                                'add_directives' => false
-                                            ])
+            $this->wysiwygConfig->getConfig(
+                ['add_variables' => false, 'add_widgets' => false, 'add_directives' => false]
+            )
         );
-
         $input->addClass('widget-option');
         $input->addClass('input-textarea');
         $input->addClass('admin__control-text');

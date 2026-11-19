@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+<!--
+ * @author      Andreas Knollmann
+ * @copyright   Copyright (c) 2014-2026 Softwareentwicklung Andreas Knollmann
+ * @license     http://www.opensource.org/licenses/mit-license.php MIT
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="google_maps_location" resource="default" engine="innodb" comment="Results of the Google Maps Geocoding API">
+        <column xsi:type="int" name="location_id" unsigned="true" nullable="false" identity="true" comment="Search Id"/>
+        <column xsi:type="varchar" name="key" length="64" nullable="false" comment="SHA-256 of the request"/>
+        <column xsi:type="text" name="location" nullable="false" comment="Location"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="location_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="GOOGLE_MAPS_LOCATION_KEY">
+            <column name="key"/>
+        </constraint>
+    </table>
+</schema>

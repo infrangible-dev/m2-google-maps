@@ -2,20 +2,25 @@
 
 declare(strict_types=1);
 
+/**
+ * @author      Andreas Knollmann
+ * @copyright   Copyright (c) 2014-2026 Softwareentwicklung Andreas Knollmann
+ * @license     http://www.opensource.org/licenses/mit-license.php MIT
+ */
+
 namespace Infrangible\GoogleMaps\Block\Widget\GoogleMaps;
 
 /**
- * @author      Andreas Knollmann
- * @copyright   2014-2024 Softwareentwicklung Andreas Knollmann
- * @license     http://www.opensource.org/licenses/mit-license.php MIT
+ * Widget with an input that suggests addresses of Google Maps (Places Autocomplete).
  */
-class Autocomplete
-    extends Maps
+class Autocomplete extends Maps
 {
     /**
+     * Sets the template.
+     *
      * @return void
      */
-    protected function _construct()
+    protected function _construct(): void
     {
         $this->setTemplate('Infrangible_GoogleMaps::autocomplete.phtml');
 
@@ -23,30 +28,34 @@ class Autocomplete
     }
 
     /**
+     * Returns the ID and name of the input.
+     *
      * @return string
      */
     public function getInputId(): string
     {
-        return $this->getData('input_id');
+        return $this->getStringData('input_id');
     }
 
     /**
+     * Returns the restrictions of the suggestions as JavaScript object properties, for example country: ["de", "at"].
+     *
      * @return string
      */
     public function getComponentRestrictions(): string
     {
-        $componentRestrictions = $this->getData('component_restrictions');
-
-        return $componentRestrictions === null ? '' : htmlspecialchars_decode($componentRestrictions);
+        return htmlspecialchars_decode($this->getStringData('component_restrictions'));
     }
 
     /**
-     * @return string
+     * Returns the value of the input of the request, or null.
+     *
+     * @return string|null
      */
     public function getInputValue(): ?string
     {
-        $request = $this->getRequest();
+        $value = $this->getRequest()->getParam($this->getInputId());
 
-        return $request->getParam($this->getData('input_id'));
+        return is_scalar($value) ? (string)$value : null;
     }
 }

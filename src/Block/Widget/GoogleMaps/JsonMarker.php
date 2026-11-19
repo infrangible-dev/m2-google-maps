@@ -2,6 +2,12 @@
 
 declare(strict_types=1);
 
+/**
+ * @author      Andreas Knollmann
+ * @copyright   Copyright (c) 2014-2026 Softwareentwicklung Andreas Knollmann
+ * @license     http://www.opensource.org/licenses/mit-license.php MIT
+ */
+
 namespace Infrangible\GoogleMaps\Block\Widget\GoogleMaps;
 
 use FeWeDev\Base\Arrays;
@@ -11,49 +17,37 @@ use Infrangible\Core\Helper\Registry;
 use Magento\Framework\View\Element\Template;
 
 /**
- * @author      Andreas Knollmann
- * @copyright   2014-2024 Softwareentwicklung Andreas Knollmann
- * @license     http://www.opensource.org/licenses/mit-license.php MIT
+ * Widget with a map and the markers of a JSON list: latitude (lat), longitude (lng), title and info window
+ * (info_window) of every marker.
  */
-class JsonMarker
-    extends Marker
+class JsonMarker extends Marker
 {
-    /** @var Json */
-    protected $json;
-
-    /** @var Arrays */
-    protected $arrays;
-
-    /** @var Variables */
-    protected $variables;
-
     /**
      * @param Template\Context $context
-     * @param Registry         $registryHelper
-     * @param Json             $json
-     * @param Arrays           $arrays
-     * @param Variables        $variables
-     * @param array            $data
+     * @param Registry $registryHelper
+     * @param Json $json
+     * @param Arrays $arrays
+     * @param Variables $variables
+     * @param array $data
+     * @phpstan-param array<string, mixed> $data
      */
     public function __construct(
         Template\Context $context,
         Registry $registryHelper,
-        Json $json,
-        Arrays $arrays,
-        Variables $variables,
+        protected Json $json,
+        protected Arrays $arrays,
+        protected Variables $variables,
         array $data = []
     ) {
         parent::__construct($context, $registryHelper, $data);
-
-        $this->json = $json;
-        $this->arrays = $arrays;
-        $this->variables = $variables;
     }
 
     /**
+     * Sets the template.
+     *
      * @return void
      */
-    protected function _construct()
+    protected function _construct(): void
     {
         $this->setTemplate('Infrangible_GoogleMaps::json_marker.phtml');
 
@@ -61,74 +55,87 @@ class JsonMarker
     }
 
     /**
+     * Returns the JSON of the markers; the widget stores {} as <<< and >>>.
+     *
      * @return string
      */
     public function getMarkerJson(): string
     {
-        $markerJson = $this->getData('marker_json');
-
         $markerJson = str_replace(
-            '<<<',
-            '{',
-            str_replace('>>>', '}', $markerJson === null ? '' : htmlspecialchars_decode($markerJson))
+            ['<<<', '>>>'],
+            ['{', '}'],
+            htmlspecialchars_decode($this->getStringData('marker_json'))
         );
 
-        $locations = $this->json->decode($markerJson);
-
-        if ($locations === null) {
-            $markerJson = stripslashes($markerJson);
-        }
-
-        return $markerJson;
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction -- widgets may store the JSON with escaped quotes
+        return $this->json->decode($markerJson) === null ? stripslashes($markerJson) : $markerJson;
     }
 
     /**
+     * Returns the markers of the JSON.
+     *
+     * @return array
+     * @phpstan-return array<int|string, mixed>
+     */
+    public function getLocations(): array
+    {
+        $markerJson = $this->getMarkerJson();
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction -- widgets may store the JSON with escaped quotes
+        $locations = $this->json->decode($markerJson) ?? $this->json->decode(stripslashes($markerJson));
+
+        return is_array($locations) ? $locations : [];
+    }
+
+    /**
+     * Returns the markers as JSON that can be part of a script element.
+     *
+     * @return string
+     */
+    public function getLocationsJson(): string
+    {
+        $json = json_encode(
+            array_values($this->getLocations()),
+            JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+        );
+
+        return $json === false ? '[]' : $json;
+    }
+
+    /**
+     * Returns the center of the markers (latitude, longitude), or 0, 0 without markers.
+     *
      * @return float[]
      */
     public function getMapCenter(): array
     {
-        $markerJson = $this->getMarkerJson();
+        $x = $y = $z = 0.0;
+        $count = 0;
 
-        $locations = $this->json->decode($markerJson);
+        foreach ($this->getLocations() as $location) {
+            $latitude = is_array($location) ? $location[ 'lat' ] ?? null : null;
+            $longitude = is_array($location) ? $location[ 'lng' ] ?? null : null;
 
-        if ($locations === null) {
-            $markerJson = stripslashes($markerJson);
-
-            $locations = $this->json->decode($markerJson);
-        }
-
-        if ($this->variables->isEmpty($locations)) {
-            return [0, 0];
-        }
-
-        $coordinates = [];
-
-        if (is_array($locations)) {
-            foreach ($locations as $location) {
-                $latitude = $this->arrays->getValue($location, 'lat');
-                $longitude = $this->arrays->getValue($location, 'lng');
-
-                if (!$this->variables->isEmpty($latitude) && !$this->variables->isEmpty($longitude)) {
-                    $coordinates[] = [$latitude, $longitude];
-                }
+            if (! is_numeric($latitude) || ! is_numeric($longitude)) {
+                continue;
             }
+
+            $latitude = deg2rad((float)$latitude);
+            $longitude = deg2rad((float)$longitude);
+
+            $x += cos($latitude) * cos($longitude);
+            $y += cos($latitude) * sin($longitude);
+            $z += sin($latitude);
+            $count++;
         }
 
-        $x = $y = $z = 0;
-
-        $n = count($coordinates);
-
-        foreach ($coordinates as $point) {
-            $lt = $point[0] * pi() / 180;
-            $lg = $point[1] * pi() / 180;
-            $x += cos($lt) * cos($lg);
-            $y += cos($lt) * sin($lg);
-            $z += sin($lt);
+        if ($count === 0) {
+            return [0.0, 0.0];
         }
 
-        $x /= $n;
-        $y /= $n;
+        $x /= $count;
+        $y /= $count;
+        $z /= $count;
 
-        return [atan2(($z / $n), sqrt($x * $x + $y * $y)) * 180 / pi(), atan2($y, $x) * 180 / pi()];
+        return [rad2deg(atan2($z, sqrt($x * $x + $y * $y))), rad2deg(atan2($y, $x))];
     }
 }

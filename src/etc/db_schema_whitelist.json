@@ -1,0 +1,13 @@
+{
+    "google_maps_location": {
+        "column": {
+            "location_id": true,
+            "key": true,
+            "location": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "GOOGLE_MAPS_LOCATION_KEY": true
+        }
+    }
+}
