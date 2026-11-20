@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.0.1
+
+### Fixed
+
+- The upgrade from version 1.x failed with "Duplicate key name 'GOOGLE_MAPS_LOCATION_KEY'": version 1.x created the
+  index of the table `google_maps_location` as a plain index instead of a unique one, which the upgrade now replaces.
+
+### Changed
+
+- Checks of the PhpStorm conventions with PHPStan: @throws of the method itself, catches of exceptions that are never
+  thrown and arguments with the default value of the parameter.
+
 ## 2.0.0
 
 ### Breaking changes

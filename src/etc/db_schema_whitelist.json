@@ -5,6 +5,9 @@
             "key": true,
             "location": true
         },
+        "index": {
+            "GOOGLE_MAPS_LOCATION_KEY": true
+        },
         "constraint": {
             "PRIMARY": true,
             "GOOGLE_MAPS_LOCATION_KEY": true
