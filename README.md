@@ -41,7 +41,7 @@ Stores > Configuration > Infrangible Solutions > Google Maps:
 ## Requirements
 
 - Magento Open Source or Adobe Commerce 2.4.6 or newer
-- PHP 8.2 or newer
+- PHP 8.1 or newer
 - An API key of the Google Maps Platform
 
 For the Hyvä theme: [Infrangible Google Maps Hyvä](https://www.infrangible.dev/modules/google-maps-hyva).
